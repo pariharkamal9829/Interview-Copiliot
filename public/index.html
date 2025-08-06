@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Copilot - WebSocket Test Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .message-log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-left: 3px solid #007bff;
+            background-color: white;
+        }
+        
+        .message.sent {
+            border-left-color: #28a745;
+        }
+        
+        .message.received {
+            border-left-color: #17a2b8;
+        }
+        
+        .message.error {
+            border-left-color: #dc3545;
+            background-color: #f8f9fa;
+        }
+        
+        .timestamp {
+            color: #6c757d;
+            font-size: 10px;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .interviewer {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .candidate {
+            background-color: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interview Copilot - WebSocket Test Client</h1>
+    
+    <div class="container">
+        <div id="connectionStatus" class="status disconnected">
+            Disconnected
+        </div>
+        
+        <div class="form-group">
+            <label for="serverUrl">WebSocket Server URL:</label>
+            <input type="text" id="serverUrl" value="ws://localhost:3000" placeholder="ws://localhost:3000">
+        </div>
+        
+        <button id="connectBtn" onclick="connect()">Connect</button>
+        <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <div class="container">
+        <h3>User Registration</h3>
+        <div class="two-column">
+            <div class="form-group">
+                <label for="userName">Name:</label>
+                <input type="text" id="userName" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label for="userRole">Role:</label>
+                <select id="userRole">
+                    <option value="interviewer">Interviewer</option>
+                    <option value="candidate">Candidate</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="register()" id="registerBtn" disabled>Register</button>
+    </div>
+    
+    <div class="container">
+        <h3>Send Messages</h3>
+        
+        <div class="form-group">
+            <label for="messageType">Message Type:</label>
+            <select id="messageType" onchange="toggleMessageFields()">
+                <option value="transcription">Transcription</option>
+                <option value="question">Question</option>
+                <option value="answer">Answer</option>
+                <option value="note">Note</option>
+                <option value="ping">Ping</option>
+            </select>
+        </div>
+        
+        <!-- Transcription fields -->
+        <div id="transcriptionFields">
+            <div class="form-group">
+                <label for="transcriptionText">Transcribed Text:</label>
+                <textarea id="transcriptionText" placeholder="Enter transcribed text..." rows="3"></textarea>
+            </div>
+            <div class="two-column">
+                <div class="form-group">
+                    <label for="confidence">Confidence (0-1):</label>
+                    <input type="number" id="confidence" min="0" max="1" step="0.01" value="0.95">
+                </div>
+                <div class="form-group">
+                    <label for="isFinal">Is Final:</label>
+                    <select id="isFinal">
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Question fields -->
+        <div id="questionFields" style="display: none;">
+            <div class="form-group">
+                <label for="questionText">Question:</label>
+                <textarea id="questionText" placeholder="Enter interview question..." rows="3"></textarea>
+            </div>
+            <div class="two-column">
+                <div class="form-group">
+                    <label for="questionCategory">Category:</label>
+                    <select id="questionCategory">
+                        <option value="technical">Technical</option>
+                        <option value="behavioral">Behavioral</option>
+                        <option value="general">General</option>
+                        <option value="coding">Coding</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="difficulty">Difficulty:</label>
+                    <select id="difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Answer fields -->
+        <div id="answerFields" style="display: none;">
+            <div class="form-group">
+                <label for="answerText">Answer:</label>
+                <textarea id="answerText" placeholder="Enter answer..." rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="questionId">Question ID (optional):</label>
+                <input type="text" id="questionId" placeholder="Related question ID">
+            </div>
+        </div>
+        
+        <!-- Note fields -->
+        <div id="noteFields" style="display: none;">
+            <div class="form-group">
+                <label for="noteText">Note:</label>
+                <textarea id="noteText" placeholder="Enter note..." rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="noteCategory">Category:</label>
+                <select id="noteCategory">
+                    <option value="general">General</option>
+                    <option value="technical">Technical Skills</option>
+                    <option value="communication">Communication</option>
+                    <option value="problem-solving">Problem Solving</option>
+                    <option value="cultural-fit">Cultural Fit</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="sendMessage()" id="sendBtn" disabled>Send Message</button>
+    </div>
+    
+    <div class="container">
+        <h3>Message Log</h3>
+        <div id="messageLog" class="message-log"></div>
+    </div>
+
+    <script>
+        let ws = null;
+        let isConnected = false;
+        let isRegistered = false;
+
+        function connect() {
+            const url = document.getElementById('serverUrl').value;
+            
+            try {
+                ws = new WebSocket(url);
+                
+                ws.onopen = function(event) {
+                    isConnected = true;
+                    updateConnectionStatus('Connected', true);
+                    document.getElementById('connectBtn').disabled = true;
+                    document.getElementById('disconnectBtn').disabled = false;
+                    document.getElementById('registerBtn').disabled = false;
+                    logMessage('Connected to server', 'received');
+                };
+                
+                ws.onmessage = function(event) {
+                    const message = JSON.parse(event.data);
+                    logMessage(`Received: ${JSON.stringify(message, null, 2)}`, 'received');
+                    
+                    if (message.type === 'registration_confirmed') {
+                        isRegistered = true;
+                        document.getElementById('sendBtn').disabled = false;
+                    }
+                };
+                
+                ws.onclose = function(event) {
+                    isConnected = false;
+                    isRegistered = false;
+                    updateConnectionStatus('Disconnected', false);
+                    document.getElementById('connectBtn').disabled = false;
+                    document.getElementById('disconnectBtn').disabled = true;
+                    document.getElementById('registerBtn').disabled = true;
+                    document.getElementById('sendBtn').disabled = true;
+                    logMessage('Disconnected from server', 'error');
+                };
+                
+                ws.onerror = function(error) {
+                    logMessage(`WebSocket error: ${error}`, 'error');
+                };
+                
+            } catch (error) {
+                logMessage(`Connection error: ${error.message}`, 'error');
+            }
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+            }
+        }
+
+        function register() {
+            if (!isConnected) {
+                alert('Please connect to the server first');
+                return;
+            }
+            
+            const name = document.getElementById('userName').value.trim();
+            const role = document.getElementById('userRole').value;
+            
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            const message = {
+                type: 'register',
+                name: name,
+                role: role
+            };
+            
+            ws.send(JSON.stringify(message));
+            logMessage(`Sent: ${JSON.stringify(message, null, 2)}`, 'sent');
+        }
+
+        function sendMessage() {
+            if (!isConnected || !isRegistered) {
+                alert('Please connect and register first');
+                return;
+            }
+            
+            const messageType = document.getElementById('messageType').value;
+            let message = { type: messageType };
+            
+            switch (messageType) {
+                case 'transcription':
+                    const text = document.getElementById('transcriptionText').value.trim();
+                    if (!text) {
+                        alert('Please enter transcription text');
+                        return;
+                    }
+                    message.text = text;
+                    message.confidence = parseFloat(document.getElementById('confidence').value);
+                    message.isFinal = document.getElementById('isFinal').value === 'true';
+                    message.language = 'en';
+                    break;
+                    
+                case 'question':
+                    const question = document.getElementById('questionText').value.trim();
+                    if (!question) {
+                        alert('Please enter a question');
+                        return;
+                    }
+                    message.question = question;
+                    message.category = document.getElementById('questionCategory').value;
+                    message.difficulty = document.getElementById('difficulty').value;
+                    break;
+                    
+                case 'answer':
+                    const answer = document.getElementById('answerText').value.trim();
+                    if (!answer) {
+                        alert('Please enter an answer');
+                        return;
+                    }
+                    message.answer = answer;
+                    const questionId = document.getElementById('questionId').value.trim();
+                    if (questionId) {
+                        message.questionId = questionId;
+                    }
+                    break;
+                    
+                case 'note':
+                    const note = document.getElementById('noteText').value.trim();
+                    if (!note) {
+                        alert('Please enter a note');
+                        return;
+                    }
+                    message.note = note;
+                    message.category = document.getElementById('noteCategory').value;
+                    break;
+                    
+                case 'ping':
+                    // No additional fields needed
+                    break;
+            }
+            
+            ws.send(JSON.stringify(message));
+            logMessage(`Sent: ${JSON.stringify(message, null, 2)}`, 'sent');
+            
+            // Clear input fields
+            clearInputFields(messageType);
+        }
+
+        function toggleMessageFields() {
+            const messageType = document.getElementById('messageType').value;
+            
+            // Hide all field groups
+            document.getElementById('transcriptionFields').style.display = 'none';
+            document.getElementById('questionFields').style.display = 'none';
+            document.getElementById('answerFields').style.display = 'none';
+            document.getElementById('noteFields').style.display = 'none';
+            
+            // Show relevant field group
+            switch (messageType) {
+                case 'transcription':
+                    document.getElementById('transcriptionFields').style.display = 'block';
+                    break;
+                case 'question':
+                    document.getElementById('questionFields').style.display = 'block';
+                    break;
+                case 'answer':
+                    document.getElementById('answerFields').style.display = 'block';
+                    break;
+                case 'note':
+                    document.getElementById('noteFields').style.display = 'block';
+                    break;
+            }
+        }
+
+        function clearInputFields(messageType) {
+            switch (messageType) {
+                case 'transcription':
+                    document.getElementById('transcriptionText').value = '';
+                    break;
+                case 'question':
+                    document.getElementById('questionText').value = '';
+                    break;
+                case 'answer':
+                    document.getElementById('answerText').value = '';
+                    document.getElementById('questionId').value = '';
+                    break;
+                case 'note':
+                    document.getElementById('noteText').value = '';
+                    break;
+            }
+        }
+
+        function updateConnectionStatus(status, connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.textContent = status;
+            statusEl.className = connected ? 'status connected' : 'status disconnected';
+        }
+
+        function logMessage(message, type = 'info') {
+            const log = document.getElementById('messageLog');
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            messageEl.innerHTML = `
+                <div class="timestamp">${timestamp}</div>
+                <pre>${message}</pre>
+            `;
+            
+            log.appendChild(messageEl);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('messageLog').innerHTML = '';
+        }
+
+        // Initialize the page
+        toggleMessageFields();
+    </script>
+</body>
+</html>

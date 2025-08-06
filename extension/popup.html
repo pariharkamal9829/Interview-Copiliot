@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Audio Capture</title>
+    <style>
+        body {
+            width: 350px;
+            height: 400px;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .header {
+            padding: 16px;
+            background: rgba(0,0,0,0.2);
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .content {
+            padding: 16px;
+        }
+        
+        .status-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .status-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+        
+        .status-indicator.connected {
+            background: #10b981;
+        }
+        
+        .status-indicator.recording {
+            background: #f59e0b;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .control-section {
+            margin-bottom: 16px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary {
+            background: #10b981;
+        }
+        
+        .btn-primary:hover {
+            background: #059669;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .settings-section {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .settings-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        input[type="text"] {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            color: white;
+            padding: 4px 8px;
+            font-size: 12px;
+            width: 180px;
+        }
+        
+        input[type="text"]::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .log-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            height: 60px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        🎤 Interview Audio Capture
+    </div>
+    
+    <div class="content">
+        <div class="status-section">
+            <div class="status-row">
+                <span>Backend Connection:</span>
+                <div class="status-indicator" id="backend-status"></div>
+            </div>
+            <div class="status-row">
+                <span>WebSocket:</span>
+                <div class="status-indicator" id="websocket-status"></div>
+            </div>
+            <div class="status-row">
+                <span>Recording:</span>
+                <div class="status-indicator" id="recording-status"></div>
+            </div>
+            <div class="status-row">
+                <span>Current Tab:</span>
+                <span id="current-tab">Unknown</span>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <button class="btn btn-primary" id="inject-script">
+                📥 Inject Content Script
+            </button>
+            <button class="btn" id="start-recording" disabled>
+                🎙️ Start Recording
+            </button>
+            <button class="btn btn-danger" id="stop-recording" disabled>
+                ⏹️ Stop Recording
+            </button>
+            <button class="btn" id="test-connection">
+                🔄 Test Connection
+            </button>
+        </div>
+        
+        <div class="settings-section">
+            <div class="settings-row">
+                <span>Backend URL:</span>
+                <input type="text" id="backend-url" value="http://localhost:3000" placeholder="Backend URL">
+            </div>
+            <div class="settings-row">
+                <span>Capture Interval:</span>
+                <input type="text" id="capture-interval" value="3000" placeholder="3000ms">
+            </div>
+        </div>
+        
+        <div class="log-section" id="activity-log">
+            Extension ready. Click "Inject Content Script" to start.
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

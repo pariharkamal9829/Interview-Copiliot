@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Suggestions - WebSocket Client</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .demo-controls {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .demo-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .demo-description {
+            margin-bottom: 20px;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .control-group input, .control-group textarea, .control-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+        }
+        
+        .control-group input::placeholder, 
+        .control-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-primary {
+            background: rgba(59, 130, 246, 0.8);
+            border-color: rgba(59, 130, 246, 0.8);
+        }
+        
+        .status-bar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #10b981;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-controls">
+        <div class="demo-title">🤖 AI Interview Assistant - WebSocket Client</div>
+        <div class="demo-description">
+            Connect to the WebSocket server to receive real-time AI suggestions during interviews. 
+            This client displays incoming transcriptions, questions, answers, and AI analysis.
+        </div>
+
+        <div class="control-group">
+            <label for="wsUrl">WebSocket Server URL:</label>
+            <input type="text" id="wsUrl" value="http://localhost:3000" placeholder="http://localhost:3000">
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="connectWebSocket()">🔌 Connect</button>
+            <button class="btn" onclick="disconnectWebSocket()">🔌 Disconnect</button>
+            <button class="btn" onclick="clearSuggestions()">🗑️ Clear Suggestions</button>
+        </div>
+
+        <div class="control-group" style="margin-top: 20px;">
+            <label>Test Message Type:</label>
+            <select id="messageType">
+                <option value="transcription">🎤 Transcription</option>
+                <option value="question">❓ Interview Question</option>
+                <option value="answer">💬 Candidate Answer</option>
+                <option value="ai-request">🤖 AI Analysis Request</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="testMessage">Test Message Content:</label>
+            <textarea id="testMessage" rows="3" placeholder="Enter test message content..."></textarea>
+        </div>
+
+        <div class="buttons">
+            <button class="btn" onclick="sendTestMessage()">📤 Send Test Message</button>
+            <button class="btn" onclick="simulateInterview()">🎭 Simulate Interview</button>
+            <button class="btn" onclick="requestNotificationPermission()">🔔 Enable Notifications</button>
+        </div>
+
+        <div class="status-bar" id="statusLog">
+WebSocket Status: Disconnected
+Waiting for connection...
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>📋 Instructions</h3>
+        <ol>
+            <li><strong>Start the Server:</strong> Make sure your WebSocket server is running on port 3000</li>
+            <li><strong>Connect:</strong> Click "Connect" to establish WebSocket connection</li>
+            <li><strong>Test Messages:</strong> Send test messages to simulate real interview scenarios</li>
+            <li><strong>View Suggestions:</strong> AI suggestions will appear in the floating panel on the left</li>
+            <li><strong>Simulate Interview:</strong> Use the "Simulate Interview" button for a demo session</li>
+        </ol>
+        
+        <h3>🎯 Features</h3>
+        <ul>
+            <li>Real-time WebSocket connection with auto-reconnect</li>
+            <li>Live transcription display from speech-to-text</li>
+            <li>AI-powered interview analysis and suggestions</li>
+            <li>Question and answer tracking</li>
+            <li>Visual feedback and notifications</li>
+        </ul>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="ai-websocket-client.js"></script>
+    <script>
+        let aiClient = null;
+        let simulationInterval = null;
+
+        // Log function
+        function log(message) {
+            const statusLog = document.getElementById('statusLog');
+            const timestamp = new Date().toLocaleTimeString();
+            statusLog.textContent += `\n[${timestamp}] ${message}`;
+            statusLog.scrollTop = statusLog.scrollHeight;
+        }
+
+        // Connect WebSocket
+        function connectWebSocket() {
+            const wsUrl = document.getElementById('wsUrl').value;
+            
+            if (aiClient) {
+                aiClient.destroy();
+            }
+
+            log(`Connecting to ${wsUrl}...`);
+            
+            aiClient = new AIWebSocketClient({
+                wsUrl: wsUrl,
+                container: document.body,
+                onSuggestion: (suggestion) => {
+                    log(`📝 New suggestion: ${suggestion.title}`);
+                    
+                    // Show notification if enabled
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification(suggestion.title, {
+                            body: suggestion.content.substring(0, 100) + '...',
+                            icon: '🤖'
+                        });
+                    }
+                },
+                onConnection: (connected) => {
+                    log(connected ? '🟢 WebSocket connected successfully' : '🔴 WebSocket disconnected');
+                },
+                onError: (error) => {
+                    log(`❌ WebSocket error: ${error.message || error}`);
+                }
+            });
+        }
+
+        // Disconnect WebSocket
+        function disconnectWebSocket() {
+            if (aiClient) {
+                aiClient.destroy();
+                aiClient = null;
+                log('🔌 WebSocket disconnected manually');
+            }
+        }
+
+        // Clear suggestions
+        function clearSuggestions() {
+            if (aiClient) {
+                aiClient.clearSuggestions();
+                log('🗑️ Suggestions cleared');
+            }
+        }
+
+        // Send test message
+        function sendTestMessage() {
+            if (!aiClient || !aiClient.isConnected) {
+                log('❌ Not connected to WebSocket');
+                return;
+            }
+
+            const messageType = document.getElementById('messageType').value;
+            const content = document.getElementById('testMessage').value;
+
+            if (!content.trim()) {
+                log('❌ Please enter test message content');
+                return;
+            }
+
+            let message = { type: messageType };
+
+            switch (messageType) {
+                case 'transcription':
+                    message = {
+                        type: 'transcription',
+                        text: content,
+                        isFinal: true,
+                        confidence: 0.95,
+                        speaker: 'Test Speaker'
+                    };
+                    break;
+                case 'question':
+                    message = {
+                        type: 'question',
+                        question: content,
+                        interviewer: 'Test Interviewer',
+                        category: 'Technical',
+                        difficulty: 'Medium'
+                    };
+                    break;
+                case 'answer':
+                    message = {
+                        type: 'answer',
+                        answer: content,
+                        candidate: 'Test Candidate'
+                    };
+                    break;
+                case 'ai-request':
+                    message = {
+                        type: 'ai-request',
+                        requestType: 'analyze-answer',
+                        requestData: {
+                            question: 'Sample technical question',
+                            answer: content,
+                            expectedSkills: ['Problem Solving', 'Communication']
+                        }
+                    };
+                    break;
+            }
+
+            aiClient.send(message);
+            log(`📤 Sent ${messageType}: ${content.substring(0, 50)}...`);
+            
+            // Clear the textarea
+            document.getElementById('testMessage').value = '';
+        }
+
+        // Simulate interview session
+        function simulateInterview() {
+            if (!aiClient || !aiClient.isConnected) {
+                log('❌ Not connected to WebSocket');
+                return;
+            }
+
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationInterval = null;
+                log('⏹️ Interview simulation stopped');
+                return;
+            }
+
+            log('🎭 Starting interview simulation...');
+            
+            const scenarios = [
+                {
+                    type: 'question',
+                    question: 'Tell me about yourself and your background in software development.',
+                    interviewer: 'Lead Developer',
+                    category: 'General',
+                    difficulty: 'Easy'
+                },
+                {
+                    type: 'transcription',
+                    text: 'I have been working as a software engineer for about 3 years now.',
+                    isFinal: true,
+                    confidence: 0.92,
+                    speaker: 'Candidate'
+                },
+                {
+                    type: 'answer',
+                    answer: 'I have been working as a software engineer for about 3 years now, primarily focusing on full-stack web development with React and Node.js.',
+                    candidate: 'Interview Candidate'
+                },
+                {
+                    type: 'question',
+                    question: 'Can you explain the difference between let, const, and var in JavaScript?',
+                    interviewer: 'Technical Lead',
+                    category: 'JavaScript',
+                    difficulty: 'Medium'
+                },
+                {
+                    type: 'transcription',
+                    text: 'Let and const are block-scoped while var is function-scoped.',
+                    isFinal: true,
+                    confidence: 0.88,
+                    speaker: 'Candidate'
+                },
+                {
+                    type: 'answer',
+                    answer: 'Let and const are block-scoped while var is function-scoped. Const creates immutable bindings while let allows reassignment.',
+                    candidate: 'Interview Candidate'
+                }
+            ];
+
+            let index = 0;
+            simulationInterval = setInterval(() => {
+                if (index >= scenarios.length) {
+                    clearInterval(simulationInterval);
+                    simulationInterval = null;
+                    log('✅ Interview simulation completed');
+                    return;
+                }
+
+                const scenario = scenarios[index];
+                aiClient.send(scenario);
+                log(`🎭 Simulated: ${scenario.type} - ${JSON.stringify(scenario).substring(0, 100)}...`);
+                
+                index++;
+            }, 3000); // Send a message every 3 seconds
+        }
+
+        // Request notification permission
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    log(`🔔 Notification permission: ${permission}`);
+                    if (permission === 'granted') {
+                        new Notification('AI Assistant', {
+                            body: 'Notifications enabled! You\'ll receive alerts for new AI suggestions.',
+                            icon: '🤖'
+                        });
+                    }
+                });
+            } else {
+                log('❌ Notifications not supported in this browser');
+            }
+        }
+
+        // Auto-connect on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 AI WebSocket Client initialized');
+            log('Ready to connect to WebSocket server...');
+            
+            // Auto-connect if server URL is provided
+            setTimeout(() => {
+                connectWebSocket();
+            }, 1000);
+        });
+
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        sendTestMessage();
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        connectWebSocket();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

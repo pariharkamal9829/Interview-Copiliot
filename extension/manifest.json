@@ -1,0 +1,119 @@
+{
+  "manifest_version": 3,
+  "name": "Interview Audio Capture",
+  "version": "1.0.0",
+  "description": "Capture audio from web pages and send to Interview Copilot backend for real-time transcription and AI analysis",
+  "homepage_url": "https://github.com/pariharkamal9829/Interview-Copiliot",
+  
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "https://localhost:3000/*",
+    "https://meet.google.com/*",
+    "https://zoom.us/*",
+    "https://*.zoom.us/*",
+    "https://teams.microsoft.com/*",
+    "https://*.teams.microsoft.com/*",
+    "https://*.webex.com/*",
+    "https://*.gotomeeting.com/*",
+    "https://*.whereby.com/*",
+    "https://*.discord.com/*"
+  ],
+  
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": [
+        "https://meet.google.com/*",
+        "https://zoom.us/*",
+        "https://teams.microsoft.com/*",
+        "https://*.zoom.us/*",
+        "https://*.teams.microsoft.com/*",
+        "https://*.webex.com/*",
+        "https://*.gotomeeting.com/*",
+        "https://*.whereby.com/*",
+        "https://*.discord.com/*"
+      ],
+      "js": ["content-script.js"],
+      "run_at": "document_end",
+      "world": "ISOLATED"
+    }
+  ],
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Interview Audio Capture - Start/Stop Recording"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content-script.js",
+        "inject-audio-capture.js",
+        "icons/*.png",
+        "assets/*"
+      ],
+      "matches": [
+        "https://meet.google.com/*",
+        "https://zoom.us/*",
+        "https://teams.microsoft.com/*",
+        "https://*.zoom.us/*",
+        "https://*.teams.microsoft.com/*",
+        "https://*.webex.com/*",
+        "https://*.gotomeeting.com/*",
+        "https://*.whereby.com/*",
+        "https://*.discord.com/*"
+      ]
+    }
+  ],
+  
+  "minimum_chrome_version": "88",
+  
+  "externally_connectable": {
+    "matches": [
+      "http://localhost:3000/*",
+      "https://localhost:3000/*"
+    ]
+  },
+  
+  "commands": {
+    "start-recording": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+R",
+        "mac": "Command+Shift+R"
+      },
+      "description": "Start audio recording"
+    },
+    "stop-recording": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Stop audio recording"
+    },
+    "toggle-recording": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+T",
+        "mac": "Command+Shift+T"
+      },
+      "description": "Toggle audio recording on/off"
+    }
+  },
+  
+  "options_page": "options.html",
+  
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' ws://localhost:3000 wss://localhost:3000 http://localhost:3000 https://localhost:3000;"
+  }
+}

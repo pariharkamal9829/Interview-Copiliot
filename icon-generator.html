@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+        .icon-preview { display: inline-block; margin: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Interview Copilot - Icon Generator</h1>
+    
+    <div class="icon-preview">
+        <canvas id="icon16" width="16" height="16"></canvas>
+        <div>16x16</div>
+        <button onclick="downloadIcon('icon16', 'icon-16.png')">Download</button>
+    </div>
+    
+    <div class="icon-preview">
+        <canvas id="icon48" width="48" height="48"></canvas>
+        <div>48x48</div>
+        <button onclick="downloadIcon('icon48', 'icon-48.png')">Download</button>
+    </div>
+    
+    <div class="icon-preview">
+        <canvas id="icon128" width="128" height="128"></canvas>
+        <div>128x128</div>
+        <button onclick="downloadIcon('icon128', 'icon-128.png')">Download</button>
+    </div>
+
+    <script>
+        function drawIcon(canvas) {
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width;
+            const scale = size / 128;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Background
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Microphone body (circle)
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(size * 0.5, size * 0.4, size * 0.2, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Microphone stand (rectangles)
+            ctx.fillRect(size * 0.35, size * 0.58, size * 0.3, size * 0.06);
+            ctx.fillRect(size * 0.23, size * 0.7, size * 0.54, size * 0.05);
+            ctx.fillRect(size * 0.27, size * 0.78, size * 0.46, size * 0.05);
+            
+            // Text "IA" (if size is large enough)
+            if (size >= 32) {
+                ctx.fillStyle = 'white';
+                ctx.font = `bold ${size * 0.09}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.fillText('IA', size * 0.5, size * 0.92);
+            }
+        }
+        
+        function downloadIcon(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Draw all icons
+        drawIcon(document.getElementById('icon16'));
+        drawIcon(document.getElementById('icon48'));
+        drawIcon(document.getElementById('icon128'));
+    </script>
+</body>
+</html>

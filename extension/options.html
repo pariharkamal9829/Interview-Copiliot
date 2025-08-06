@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Audio Capture - Settings</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+            color: #1f2937;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2em;
+        }
+        
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .settings-section {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group small {
+            display: block;
+            margin-top: 4px;
+            color: #6b7280;
+            font-size: 12px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        .btn-test {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-test:hover {
+            background: #059669;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .status-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1e40af;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .test-results {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .keyboard-shortcuts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f9fafb;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .shortcut-key {
+            background: #374151;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #10b981;
+        }
+        
+        .notification.error {
+            background: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎤 Interview Audio Capture</h1>
+        <p>Configure settings for audio capture and backend integration</p>
+    </div>
+
+    <div class="settings-section">
+        <div class="section-title">🔗 Backend Configuration</div>
+        
+        <div class="form-group">
+            <label for="backend-url">Backend Server URL</label>
+            <input type="url" id="backend-url" placeholder="http://localhost:3000">
+            <small>The URL of your Interview Copilot backend server</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="websocket-url">WebSocket URL</label>
+            <input type="url" id="websocket-url" placeholder="ws://localhost:3000">
+            <small>WebSocket endpoint for real-time communication</small>
+        </div>
+        
+        <div class="form-group">
+            <button class="btn btn-test" onclick="testConnection()">🔄 Test Connection</button>
+            <div id="connection-status"></div>
+            <div id="test-results" class="test-results" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <div class="section-title">🎙️ Audio Capture Settings</div>
+        
+        <div class="form-group">
+            <label for="capture-interval">Capture Interval (milliseconds)</label>
+            <input type="number" id="capture-interval" min="1000" max="10000" step="500" value="3000">
+            <small>How often to send audio chunks to the backend (1000-10000ms)</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="audio-quality">Audio Quality</label>
+            <select id="audio-quality">
+                <option value="low">Low (faster processing)</option>
+                <option value="medium" selected>Medium (balanced)</option>
+                <option value="high">High (better accuracy)</option>
+            </select>
+            <small>Higher quality uses more bandwidth but improves transcription accuracy</small>
+        </div>
+        
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="noise-suppression" checked>
+                <label for="noise-suppression">Enable noise suppression</label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="echo-cancellation" checked>
+                <label for="echo-cancellation">Enable echo cancellation</label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="auto-gain-control" checked>
+                <label for="auto-gain-control">Enable automatic gain control</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <div class="section-title">⚙️ Extension Behavior</div>
+        
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="auto-inject" checked>
+                <label for="auto-inject">Auto-inject on video conferencing sites</label>
+            </div>
+            <small>Automatically load audio capture when visiting supported video platforms</small>
+        </div>
+        
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="show-notifications" checked>
+                <label for="show-notifications">Show desktop notifications</label>
+            </div>
+            <small>Get notified when recording starts, stops, or encounters errors</small>
+        </div>
+        
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="persistent-ui">
+                <label for="persistent-ui">Keep UI visible across page reloads</label>
+            </div>
+            <small>Maintain the capture interface when navigating within the same site</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="ui-position">UI Position</label>
+            <select id="ui-position">
+                <option value="top-right" selected>Top Right</option>
+                <option value="top-left">Top Left</option>
+                <option value="bottom-right">Bottom Right</option>
+                <option value="bottom-left">Bottom Left</option>
+            </select>
+            <small>Default position for the floating capture interface</small>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <div class="section-title">⌨️ Keyboard Shortcuts</div>
+        
+        <div class="keyboard-shortcuts">
+            <div class="shortcut-item">
+                <span>Start Recording</span>
+                <span class="shortcut-key">Ctrl+Shift+R</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Stop Recording</span>
+                <span class="shortcut-key">Ctrl+Shift+S</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Toggle Recording</span>
+                <span class="shortcut-key">Ctrl+Shift+T</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Open Settings</span>
+                <span class="shortcut-key">Ctrl+Shift+O</span>
+            </div>
+        </div>
+        
+        <small style="margin-top: 12px; display: block; color: #6b7280;">
+            Shortcuts work on supported video conferencing sites when the extension is active
+        </small>
+    </div>
+
+    <div class="settings-section">
+        <div class="section-title">📊 Usage Statistics</div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <div style="text-align: center; padding: 16px; background: #f9fafb; border-radius: 6px;">
+                <div style="font-size: 24px; font-weight: 600; color: #374151;" id="total-sessions">-</div>
+                <div style="font-size: 12px; color: #6b7280;">Total Sessions</div>
+            </div>
+            <div style="text-align: center; padding: 16px; background: #f9fafb; border-radius: 6px;">
+                <div style="font-size: 24px; font-weight: 600; color: #374151;" id="total-duration">-</div>
+                <div style="font-size: 12px; color: #6b7280;">Total Duration</div>
+            </div>
+            <div style="text-align: center; padding: 16px; background: #f9fafb; border-radius: 6px;">
+                <div style="font-size: 24px; font-weight: 600; color: #374151;" id="last-session">-</div>
+                <div style="font-size: 12px; color: #6b7280;">Last Session</div>
+            </div>
+        </div>
+        
+        <div class="button-group" style="border-top: none; padding-top: 16px; justify-content: flex-start;">
+            <button class="btn btn-secondary" onclick="exportData()">📤 Export Data</button>
+            <button class="btn btn-secondary" onclick="clearStats()">🗑️ Clear Statistics</button>
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button class="btn btn-secondary" onclick="resetToDefaults()">🔄 Reset to Defaults</button>
+        <button class="btn btn-secondary" onclick="exportSettings()">📤 Export Settings</button>
+        <button class="btn btn-secondary" onclick="importSettings()">📥 Import Settings</button>
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+    </div>
+
+    <input type="file" id="import-file" accept=".json" style="display: none;" onchange="handleImportFile(event)">
+
+    <script src="options.js"></script>
+</body>
+</html>

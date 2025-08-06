@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Capture Injection Guide</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1, h2 {
+            color: white;
+            margin-top: 0;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .method-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #10b981;
+        }
+        
+        .method-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #10b981;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+        
+        .btn:hover {
+            background: #059669;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .demo-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #f59e0b;
+        }
+        
+        .warning {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        th {
+            background: rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Interview Audio Capture - Injection Guide</h1>
+        
+        <div class="success">
+            <strong>✅ What This Does:</strong> Inject audio capture functionality into any web page to record interview audio and send it to your backend for transcription and AI analysis.
+        </div>
+        
+        <h2>🚀 Quick Start Methods</h2>
+        
+        <div class="method-card">
+            <div class="method-title">Method 1: Browser Extension (Recommended)</div>
+            <p>Load the browser extension for automatic injection on video conferencing sites.</p>
+            
+            <ol>
+                <li>Open Chrome and go to <code>chrome://extensions/</code></li>
+                <li>Enable "Developer mode" (top right toggle)</li>
+                <li>Click "Load unpacked" and select the <code>extension</code> folder</li>
+                <li>Visit any video conferencing site (Google Meet, Zoom, etc.)</li>
+                <li>Click the extension icon to control recording</li>
+            </ol>
+            
+            <div class="warning">
+                <strong>⚠️ Supported Sites:</strong> Google Meet, Zoom, Microsoft Teams, WebEx, GoToMeeting
+            </div>
+        </div>
+        
+        <div class="method-card">
+            <div class="method-title">Method 2: Bookmarklet (Universal)</div>
+            <p>Create a bookmark that can inject the capture script on any website.</p>
+            
+            <ol>
+                <li>Copy the bookmarklet code below</li>
+                <li>Create a new bookmark in your browser</li>
+                <li>Paste the code as the URL</li>
+                <li>Visit any website and click the bookmark</li>
+            </ol>
+            
+            <button class="btn" onclick="copyBookmarklet()">📋 Copy Bookmarklet Code</button>
+            <button class="btn btn-secondary" onclick="testBookmarklet()">🧪 Test Bookmarklet</button>
+            
+            <div class="code-block" id="bookmarklet-code">
+                Loading bookmarklet code...
+            </div>
+        </div>
+        
+        <div class="method-card">
+            <div class="method-title">Method 3: Manual Script Injection</div>
+            <p>Manually inject the script via browser console or external script tag.</p>
+            
+            <div class="code-block">
+// Option A: Console injection
+const script = document.createElement('script');
+script.src = 'http://localhost:3000/inject-audio-capture.js';
+document.head.appendChild(script);
+
+// Option B: Direct execution
+fetch('http://localhost:3000/inject-audio-capture.js')
+  .then(response => response.text())
+  .then(code => eval(code));
+            </div>
+            
+            <button class="btn" onclick="injectViaConsole()">🔧 Inject via Console</button>
+            <button class="btn btn-secondary" onclick="copyConsoleCode()">📋 Copy Console Code</button>
+        </div>
+        
+        <h2>🎯 Features & Capabilities</h2>
+        
+        <div class="feature-list">
+            <div class="feature-item">
+                <strong>🎙️ Real-time Audio Capture</strong><br>
+                Continuous microphone recording with 3-second chunks
+            </div>
+            <div class="feature-item">
+                <strong>📡 WebSocket Integration</strong><br>
+                Live audio streaming to your backend server
+            </div>
+            <div class="feature-item">
+                <strong>🤖 AI Integration</strong><br>
+                Automatic transcription and AI analysis
+            </div>
+            <div class="feature-item">
+                <strong>🎮 Simple Controls</strong><br>
+                Start/stop recording with one click
+            </div>
+            <div class="feature-item">
+                <strong>🔄 Auto-reconnect</strong><br>
+                Automatic WebSocket reconnection on failure
+            </div>
+            <div class="feature-item">
+                <strong>📱 Cross-platform</strong><br>
+                Works on any modern browser and device
+            </div>
+        </div>
+        
+        <h2>🛠️ Configuration</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Setting</th>
+                    <th>Default Value</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Backend URL</td>
+                    <td>http://localhost:3000</td>
+                    <td>Your Interview Copilot server endpoint</td>
+                </tr>
+                <tr>
+                    <td>WebSocket URL</td>
+                    <td>ws://localhost:3000</td>
+                    <td>WebSocket connection for real-time data</td>
+                </tr>
+                <tr>
+                    <td>Capture Interval</td>
+                    <td>3000ms</td>
+                    <td>Audio chunk duration for processing</td>
+                </tr>
+                <tr>
+                    <td>Auto Start</td>
+                    <td>false</td>
+                    <td>Automatically start recording on injection</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="demo-section">
+            <h3>🧪 Live Demo</h3>
+            <p>Test the audio capture functionality right here:</p>
+            
+            <button class="btn" onclick="testInjectHere()">🎤 Test Inject Here</button>
+            <button class="btn btn-secondary" onclick="testWebSocketConnection()">🔄 Test WebSocket</button>
+            <button class="btn btn-secondary" onclick="requestMicPermission()">🎙️ Request Mic Permission</button>
+            
+            <div id="demo-status" style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px;">
+                Ready for testing...
+            </div>
+        </div>
+        
+        <h2>📋 Usage Steps</h2>
+        
+        <ol>
+            <li><strong>Start Your Server:</strong> Make sure your Interview Copilot server is running on port 3000</li>
+            <li><strong>Choose Injection Method:</strong> Use browser extension, bookmarklet, or manual injection</li>
+            <li><strong>Grant Permissions:</strong> Allow microphone access when prompted</li>
+            <li><strong>Start Recording:</strong> Click the record button in the injected interface</li>
+            <li><strong>Monitor Status:</strong> Watch for connection and recording indicators</li>
+            <li><strong>Stop When Done:</strong> Click stop to end recording and process final audio</li>
+        </ol>
+        
+        <div class="warning">
+            <strong>🔒 Privacy Notice:</strong> This tool captures audio from your microphone for interview analysis. Audio is sent to your local server only. Make sure you have permission to record in your interview context.
+        </div>
+        
+        <h2>🐛 Troubleshooting</h2>
+        
+        <div class="feature-list">
+            <div class="feature-item">
+                <strong>❌ WebSocket Connection Failed</strong><br>
+                Check that your server is running and WebSocket port is accessible
+            </div>
+            <div class="feature-item">
+                <strong>🎤 Microphone Access Denied</strong><br>
+                Grant microphone permissions in browser settings
+            </div>
+            <div class="feature-item">
+                <strong>📡 Upload Failures</strong><br>
+                Verify backend URL and API endpoints are working
+            </div>
+            <div class="feature-item">
+                <strong>🔧 Script Injection Blocked</strong><br>
+                Some sites may block script injection - try bookmarklet method
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="btn" onclick="window.open('http://localhost:3000/ai-suggestions.html', '_blank')">
+                🚀 Open AI Suggestions Demo
+            </button>
+            <button class="btn btn-secondary" onclick="window.open('http://localhost:3000', '_blank')">
+                🌐 Open Main Server
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let demoStatus = null;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            demoStatus = document.getElementById('demo-status');
+            loadBookmarkletCode();
+        });
+        
+        function log(message) {
+            if (demoStatus) {
+                const timestamp = new Date().toLocaleTimeString();
+                demoStatus.textContent += `\n[${timestamp}] ${message}`;
+                demoStatus.scrollTop = demoStatus.scrollHeight;
+            }
+        }
+        
+        async function loadBookmarkletCode() {
+            try {
+                const response = await fetch('/bookmarklet.js');
+                const code = await response.text();
+                const bookmarkletEl = document.getElementById('bookmarklet-code');
+                if (bookmarkletEl) {
+                    bookmarkletEl.textContent = code;
+                }
+            } catch (error) {
+                console.error('Failed to load bookmarklet code:', error);
+            }
+        }
+        
+        function copyBookmarklet() {
+            const codeEl = document.getElementById('bookmarklet-code');
+            if (codeEl) {
+                navigator.clipboard.writeText(codeEl.textContent).then(() => {
+                    alert('📋 Bookmarklet code copied to clipboard!\n\nCreate a new bookmark and paste this as the URL.');
+                });
+            }
+        }
+        
+        function testBookmarklet() {
+            eval(document.getElementById('bookmarklet-code').textContent);
+        }
+        
+        function injectViaConsole() {
+            const script = document.createElement('script');
+            script.src = '/inject-audio-capture.js';
+            script.onload = () => log('✅ Script injected successfully');
+            script.onerror = () => log('❌ Failed to inject script');
+            document.head.appendChild(script);
+        }
+        
+        function copyConsoleCode() {
+            const code = `const script = document.createElement('script');
+script.src = 'http://localhost:3000/inject-audio-capture.js';
+document.head.appendChild(script);`;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                alert('📋 Console code copied! Paste it in the browser console (F12) on any website.');
+            });
+        }
+        
+        function testInjectHere() {
+            log('🧪 Testing injection on this page...');
+            injectViaConsole();
+        }
+        
+        async function testWebSocketConnection() {
+            log('🔄 Testing WebSocket connection...');
+            
+            try {
+                const ws = new WebSocket('ws://localhost:3000');
+                
+                ws.onopen = () => {
+                    log('✅ WebSocket connection successful');
+                    ws.close();
+                };
+                
+                ws.onerror = () => {
+                    log('❌ WebSocket connection failed - check if server is running');
+                };
+                
+                ws.onclose = () => {
+                    log('🔌 WebSocket connection closed');
+                };
+                
+            } catch (error) {
+                log('❌ WebSocket test failed: ' + error.message);
+            }
+        }
+        
+        async function requestMicPermission() {
+            log('🎙️ Requesting microphone permission...');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                log('✅ Microphone access granted');
+                
+                // Stop the stream immediately
+                stream.getTracks().forEach(track => track.stop());
+                
+            } catch (error) {
+                log('❌ Microphone access denied: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
